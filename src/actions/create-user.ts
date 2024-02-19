@@ -1,9 +1,11 @@
 "use server";
 
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 import { CreateUserSchema, CreateUserValues } from "@/lib/validation";
 import { db } from "@/lib/db";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/verification-mail";
 
 export const createUser = async (values: CreateUserValues) => {
   const validatedFields = CreateUserSchema.safeParse(values);
@@ -37,5 +39,8 @@ export const createUser = async (values: CreateUserValues) => {
       password: hashedPassword,
     },
   });
-  return { success: `User ${name} created successfully!` };
+
+  const verificationToken = await generateVerificationToken(email);
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
+  return { success: `Confirmation email sent` };
 };

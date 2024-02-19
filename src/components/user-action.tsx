@@ -1,10 +1,11 @@
-import { Bell, LogIn, UserRoundPlus } from "lucide-react";
+import { Bell, LogIn, LogOut, UserRoundPlus } from "lucide-react";
 import { Button } from "./ui/button";
 
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import { LoginButton } from "./auth/login-button";
 import { RegisterButton } from "./auth/register-button";
+import { signOut } from "@/auth";
 
 const UserAction = () => {
   return (
@@ -35,6 +36,19 @@ const UserAction = () => {
             Signup
           </Button>
         </RegisterButton>
+
+        <form
+          action={async () => {
+            "use server";
+            await signOut();
+          }}
+        >
+          <Button type="submit" className="flex items-center">
+            {" "}
+            <LogOut className="w-4 h-4 shrink-0 mr-2" />
+            Sign out
+          </Button>
+        </form>
       </div>
 
       <div></div>

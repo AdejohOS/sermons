@@ -17,13 +17,17 @@ import { Input } from "../ui/input";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import LoadingButton from "../loading-btn";
-import { startTransition, useState } from "react";
+import { useState, useTransition } from "react";
 
 import { createUser } from "@/actions/create-user";
+import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<CreateUserValues>({
     resolver: zodResolver(CreateUserSchema),
@@ -71,7 +75,7 @@ export const RegisterForm = () => {
                     <Input
                       placeholder="john doe"
                       {...field}
-                      disabled={isSubmitting}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -88,7 +92,7 @@ export const RegisterForm = () => {
                     <Input
                       placeholder="email@johndoe.com"
                       {...field}
-                      disabled={isSubmitting}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -106,7 +110,7 @@ export const RegisterForm = () => {
                       placeholder="********"
                       {...field}
                       type="password"
-                      disabled={isSubmitting}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -117,13 +121,15 @@ export const RegisterForm = () => {
           <FormError message={error} />
           <FormSuccess message={success} />
 
-          <LoadingButton
-            type="submit"
-            loading={isSubmitting}
-            className="w-full"
-          >
-            Create an account
-          </LoadingButton>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? (
+              <span className="flex items-center">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...
+              </span>
+            ) : (
+              "Create account"
+            )}
+          </Button>
         </form>
       </Form>
     </CardWrapper>

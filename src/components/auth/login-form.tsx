@@ -17,12 +17,22 @@ import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import LoadingButton from "../loading-btn";
-import { startTransition, useState } from "react";
+import { useTransition, useState } from "react";
 import { login } from "@/actions/login";
+import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+
+  const [isPending, startTransition] = useTransition();
+
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email already used with a different provider"
+      : "";
 
   const form = useForm<LoginUserValues>({
     resolver: zodResolver(LoginUserSchema),
@@ -42,10 +52,19 @@ export const LoginForm = () => {
     setSuccess("");
 
     startTransition(() => {
-      login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
-      });
+      login(values)
+        .then((data) => {
+          if (data?.error) {
+            form.reset();
+            setError(data.error);
+          }
+
+          if (data?.success) {
+            form.reset();
+            setSuccess(data.success);
+          }
+        })
+        .catch(() => setError("Something went wrong"));
     });
   };
 
@@ -69,7 +88,7 @@ export const LoginForm = () => {
                     <Input
                       placeholder="email@johndoe.com"
                       {...field}
-                      disabled={isSubmitting}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -87,7 +106,7 @@ export const LoginForm = () => {
                       placeholder="********"
                       {...field}
                       type="password"
-                      disabled={isSubmitting}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -95,16 +114,19 @@ export const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSuccess message={success} />
 
-          <LoadingButton
-            type="submit"
-            loading={isSubmitting}
-            className="w-full"
-          >
-            Login
-          </LoadingButton>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? (
+              <span className="flex items-center">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Logging you
+                in...
+              </span>
+            ) : (
+              "Login"
+            )}
+          </Button>
         </form>
       </Form>
     </CardWrapper>
