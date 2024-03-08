@@ -21,6 +21,7 @@ import { useTransition, useState } from "react";
 import { login } from "@/actions/login";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -109,6 +110,14 @@ export const LoginForm = () => {
                       disabled={isPending}
                     />
                   </FormControl>
+                  <Button
+                    variant="link"
+                    asChild
+                    size="sm"
+                    className="px-0 font-normal"
+                  >
+                    <Link href="/auth/reset">Forgot password?</Link>
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}

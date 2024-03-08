@@ -4,7 +4,7 @@ import { signIn } from "@/auth";
 import { getUserByEmail } from "@/data/user";
 import { generateVerificationToken } from "@/lib/tokens";
 import { LoginUserSchema, LoginUserValues } from "@/lib/validation";
-import { sendVerificationEmail } from "@/lib/verification-mail";
+import { sendVerificationEmail } from "@/lib/mail";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 import credentials from "next-auth/providers/credentials";

@@ -57,3 +57,75 @@ model VerificationToken {
   @@unique([email, token])
 }
 
+model PasswordResetToken {
+  id String @id @default(cuid())
+  email String
+  token String @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model Author {
+  id String @id @default(cuid())
+  name String
+  imageUrl String?
+  about String?
+
+  sermon Sermon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id String @id @default(cuid())
+  name String
+  imageUrl String?
+  about String?
+
+  sermon Sermon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id String @id @default(cuid())
+  name String
+  imageUrl String?
+  address String?
+
+  sermon Sermon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sermon {
+  id String @id @default(cuid())
+  title String
+  imageUrl String?
+  fileUrl String
+  about String?
+  dateDelivered DateTime @default(now())
+  isPublished Boolean @default(false) 
+
+  authorId String
+  author Author @relation(fields: [authorId], references: [id])
+
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+
+  locationId String
+  location Location @relation(fields: [locationId], references: [id])
+
+  createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([categoryId])
+ @@index([locationId])
+
+}
+

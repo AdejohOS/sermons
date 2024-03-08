@@ -4,13 +4,16 @@ import {
   CalendarCheck,
   Compass,
   FoldHorizontal,
+  Folder,
   GalleryThumbnails,
+  Heart,
   Layout,
   Play,
   TicketCheck,
   Videotape,
 } from "lucide-react";
 import SidebarItem from "./sidebar-item";
+import { usePathname } from "next/navigation";
 
 const adminRoutes = [
   {
@@ -32,7 +35,7 @@ const adminRoutes = [
   {
     icon: Videotape,
     label: "Author",
-    href: "/admin/author",
+    href: "/admin/authors",
   },
   {
     icon: CalendarCheck,
@@ -43,28 +46,29 @@ const adminRoutes = [
 
 const userRoutes = [
   {
-    icon: TicketCheck,
-    label: "search",
-    href: "/search",
+    icon: Compass,
+    label: "Browse",
+    href: "/",
   },
   {
-    icon: FoldHorizontal,
-    label: "library",
+    icon: Folder,
+    label: "Library",
     href: "/playlist",
   },
+
   {
-    icon: FoldHorizontal,
-    label: "create-collection",
-    href: "/playlist",
-  },
-  {
-    icon: FoldHorizontal,
-    label: "liked",
+    icon: Heart,
+    label: "Liked",
     href: "/playlist",
   },
 ];
 
 const SidebarRoutes = () => {
+  const pathName = usePathname();
+
+  // const isAdminRoutes = pathName?.includes("/admin");
+
+  //const routes = isAdminRoutes ? adminRoutes : userRoutes;
   return (
     <div className="flex flex-col w-full">
       {adminRoutes.map((route) => (

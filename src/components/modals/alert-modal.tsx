@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Modal } from "./modal";
+import { Author } from "@prisma/client";
+import { Loader2 } from "lucide-react";
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -39,7 +41,13 @@ export const AlertModal = ({
         <Button disabled={loading} variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button disabled={loading} variant="destructive" onClick={onConfirm}>
+        <Button
+          disabled={loading}
+          variant="destructive"
+          onClick={onConfirm}
+          className="flex items-center"
+        >
+          {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           Continue
         </Button>
       </div>

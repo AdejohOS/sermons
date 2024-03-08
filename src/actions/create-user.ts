@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { CreateUserSchema, CreateUserValues } from "@/lib/validation";
 import { db } from "@/lib/db";
 import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/verification-mail";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const createUser = async (values: CreateUserValues) => {
   const validatedFields = CreateUserSchema.safeParse(values);
