@@ -103,7 +103,7 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
       }
 
       router.refresh();
-      router.push(`/admin/author`);
+      router.push(`/admin/authors`);
       toast.success(toastMessage);
     } catch (error: any) {
       toast.error("Something went wrong.");
@@ -133,10 +133,10 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
 
   const handleFileDelete = async (imageUrl: string) => {
     setFileIsDeleting(true);
-    const fileKey = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+    const imageKey = imageUrl.split("/").slice(-1)[0];
 
     axios
-      .post("/api/uploadthing/delete", { fileKey })
+      .post("/api/uploadthing/delete", { imageKey })
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");

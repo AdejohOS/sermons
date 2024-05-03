@@ -8,7 +8,7 @@ import { CellAction } from "./cell-action";
 export type SermonColumn = {
   id: string;
   title: string;
-  dateDelivered: string | null;
+  dateDelivered: string;
 };
 
 export const columns: ColumnDef<SermonColumn>[] = [

@@ -4,26 +4,36 @@ import {
   CalendarCheck,
   Compass,
   FoldHorizontal,
+  MapPin,
   Folder,
   GalleryThumbnails,
   Heart,
   Layout,
+  Mic,
   Play,
-  TicketCheck,
   Videotape,
+  SearchIcon,
 } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
+import { SheetClose } from "@/components/ui/sheet";
+import { useState } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 const adminRoutes = [
   {
-    icon: Layout,
-    label: "Overview",
+    icon: SearchIcon,
+    label: "Browse",
     href: "/",
+  },
+  {
+    icon: Compass,
+    label: "Overview",
+    href: "/admin/overview",
   },
 
   {
-    icon: Compass,
+    icon: Play,
     label: "Sermons",
     href: "/admin/sermons",
   },
@@ -33,12 +43,12 @@ const adminRoutes = [
     href: "/admin/categories",
   },
   {
-    icon: Videotape,
+    icon: Mic,
     label: "Author",
     href: "/admin/authors",
   },
   {
-    icon: CalendarCheck,
+    icon: MapPin,
     label: "Locations",
     href: "/admin/locations",
   },
@@ -65,13 +75,19 @@ const userRoutes = [
 
 const SidebarRoutes = () => {
   const pathName = usePathname();
+  const user = useCurrentUser();
 
   // const isAdminRoutes = pathName?.includes("/admin");
 
   //const routes = isAdminRoutes ? adminRoutes : userRoutes;
+
+  const isAdminRoutes = user?.role === "ADMIN";
+
+  const routes = isAdminRoutes ? adminRoutes : userRoutes;
+
   return (
     <div className="flex flex-col w-full">
-      {adminRoutes.map((route) => (
+      {routes.map((route) => (
         <SidebarItem
           key={route.href}
           icon={route.icon}
@@ -84,3 +100,7 @@ const SidebarRoutes = () => {
 };
 
 export default SidebarRoutes;
+
+export function SidebarSheetClose() {
+  return <SheetClose asChild></SheetClose>;
+}

@@ -99,7 +99,7 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
       }
 
       router.refresh();
-      router.push(`/admin/category`);
+      router.push(`/admin/categories`);
       toast.success(toastMessage);
     } catch (error: any) {
       toast.error("Something went wrong.");

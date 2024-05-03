@@ -11,6 +11,8 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
+import QueryProvider from "@/providers/query-provider";
+import Player from "@/components/player";
 
 const font = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -31,21 +33,26 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <SessionProvider session={session}>
-      <html lang="en" suppressHydrationWarning={true}>
-        <body className={font.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            storageKey="koinonia-app-1"
-          >
-            <ToastProvider />
-            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
+      <QueryProvider>
+        <html lang="en" suppressHydrationWarning={true}>
+          <body className={font.className}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              storageKey="koinonia-app-1"
+            >
+              <ToastProvider />
+              <NextSSRPlugin
+                routerConfig={extractRouterConfig(ourFileRouter)}
+              />
+              {children}
+              <Player />
+            </ThemeProvider>
+          </body>
+        </html>
+      </QueryProvider>
     </SessionProvider>
   );
 }

@@ -99,7 +99,7 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
       }
 
       router.refresh();
-      router.push(`/admin/location`);
+      router.push(`/admin/locations`);
       toast.success(toastMessage);
     } catch (error: any) {
       toast.error("Something went wrong.");

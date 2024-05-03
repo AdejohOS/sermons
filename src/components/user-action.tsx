@@ -20,11 +20,14 @@ const UserAction = () => {
         {!!user ? (
           <div className="flex items-center gap-4">
             <Button
-              type="button"
+              size="icon"
               variant="outline"
-              className="rounded-full p-3 border"
+              className="rounded-full p-3 border relative"
             >
-              <Bell className="h-4 w-4 shrink-0" />
+              <Bell className="h-[1.2rem] w-[1.2rem] shrink-0" />
+              <div className="absolute right-[-.4rem] bottom-0 text-xs  text-background h-4 w-4 bg-foreground rounded-full overflow-hiddden flex items-center justify-center">
+                20
+              </div>
             </Button>
 
             <UserButton />

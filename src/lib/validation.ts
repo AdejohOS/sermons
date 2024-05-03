@@ -61,10 +61,10 @@ export const SermonSchema = z.object({
   about: z.string().max(50).optional(),
   imageUrl: z.string().optional(),
   fileUrl: z.string(),
-  preacher: z.string(),
-  category: z.string(),
-  location: z.string(),
+  authorId: z.string().min(1),
+  locationId: z.string().min(1),
+  categoryId: z.string().min(1),
+  isPublished: z.boolean().default(false).optional(),
   dateDelivered: z.date(),
-  isPublished: z.boolean(),
 });
 export type SermonValues = z.infer<typeof SermonSchema>;

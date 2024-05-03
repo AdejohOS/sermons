@@ -15,10 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { AuthorColumn } from "./columns";
+import { SermonColumn } from "./columns";
 
 interface CellActionProps {
-  data: AuthorColumn;
+  data: SermonColumn;
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -31,7 +31,7 @@ export const CellAction = ({ data }: CellActionProps) => {
     try {
       setLoading(true);
 
-      toast.success("Product deleted.");
+      toast.success("Sermon deleted.");
       router.refresh();
     } catch (error) {
       toast.error("Something went wrong");
@@ -64,7 +64,7 @@ export const CellAction = ({ data }: CellActionProps) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => router.push(`/admin/author/${data.id}`)}
+            onClick={() => router.push(`/admin/sermons/${data.id}`)}
           >
             <Eye className="mr-2 h-4 w-4" /> View
           </DropdownMenuItem>
@@ -72,9 +72,7 @@ export const CellAction = ({ data }: CellActionProps) => {
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              router.push(`/admin/author/${data.id}`)
-            }
+            onClick={() => router.push(`/admin/sermons/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

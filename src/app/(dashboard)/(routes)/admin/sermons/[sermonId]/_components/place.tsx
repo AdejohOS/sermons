@@ -50,13 +50,6 @@ import { Calendar } from "@/components/ui/calendar";
 
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface SermonFormProps {
   initialData: Sermon | null;
@@ -72,14 +65,13 @@ const SermonForm = ({
   locations,
 }: SermonFormProps) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [imageIsDeleting, setImageIsDeleting] = useState(false);
   const [fileIsDeleting, setFileIsDeleting] = useState(false);
 
   const [imageUrl, setImageUrl] = useState<string | null | undefined>(
     initialData?.imageUrl
   );
   const [fileUrl, setFileUrl] = useState<string | null | undefined>(
-    initialData?.fileUrl
+    initialData?.imageUrl
   );
 
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -97,16 +89,14 @@ const SermonForm = ({
   const form = useForm<SermonValues>({
     resolver: zodResolver(SermonSchema),
     defaultValues: {
-      title: initialData?.title || "",
+      title: "",
+      authorId: "",
+      categoryId: "",
+      about: "",
       imageUrl: "",
       fileUrl: "",
-      about: initialData?.about || "",
-
-      authorId: initialData?.authorId || "",
-      locationId: initialData?.locationId || "",
-      categoryId: initialData?.categoryId || "",
-      isPublished: initialData?.isPublished || false,
-      dateDelivered: initialData?.dateDelivered || undefined,
+      locationId: "",
+      isPublished: false,
     },
   });
 
@@ -141,18 +131,13 @@ const SermonForm = ({
     setLoading(true);
     const getImageKey = (src: string) =>
       src.substring(src.lastIndexOf("/") + 1);
-
-    const getFileKey = (src: string) => src.substring(src.lastIndexOf("/") + 1);
     try {
       const fileKey = getImageKey(initialData?.imageUrl!);
-      const sermonKey = getFileKey(initialData?.fileUrl!);
-
       axios.post("/api/uploadthing/delete", { fileKey });
-      axios.post("/api/uploadthing/clear", { sermonKey });
-      await axios.delete(`/api/sermon/${params.sermonId}`);
+      await axios.delete(`/api/author/${params.authorId}`);
       router.refresh();
-      router.push(`/admin/sermons`);
-      toast.success("Sermon deleted.");
+      router.push(`/admin/author`);
+      toast.success("Author deleted.");
     } catch (error: any) {
       toast.error("Something went wrong.");
     } finally {
@@ -162,11 +147,11 @@ const SermonForm = ({
   };
 
   const handleImageDelete = async (imageUrl: string) => {
-    setImageIsDeleting(true);
-    const imageKey = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+    setFileIsDeleting(true);
+    const fileKey = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
 
     axios
-      .post("/api/uploadthing/delete", { imageKey })
+      .post("/api/uploadthing/delete", { fileKey })
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");
@@ -177,7 +162,7 @@ const SermonForm = ({
         toast.error("Something went wrong");
       })
       .finally(() => {
-        setImageIsDeleting(false);
+        setFileIsDeleting(false);
       });
   };
 
@@ -186,7 +171,7 @@ const SermonForm = ({
     const fileKey = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
     axios
-      .post("/api/uploadthing/clear", { fileKey })
+      .post("/api/uploadthing/delete", { fileKey })
       .then((res) => {
         if (res.data.success) {
           setFileUrl("");
@@ -262,36 +247,64 @@ const SermonForm = ({
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="authorId"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sermon Minister:</FormLabel>
-                      <Select
-                        disabled={isLoading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select an author"
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Sermon Preacher:</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? authors.find(
+                                    (author) => author.name === field.value
+                                  )?.name
+                                : "Select an author"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search minister..."
+                              className="h-9"
                             />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {authors.map((author) => (
-                            <SelectItem key={author.id} value={author.id}>
-                              {author.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                            <CommandEmpty>No minister found.</CommandEmpty>
+
+                            <CommandGroup>
+                              {authors.map((author) => (
+                                <CommandItem
+                                  value={author.name}
+                                  key={author.id}
+                                  onSelect={() => {
+                                    form.setValue("authorId", author.name);
+                                  }}
+                                >
+                                  {author.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      author.name === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </FormItem>
                   )}
                 />
@@ -302,35 +315,63 @@ const SermonForm = ({
                   control={form.control}
                   name="categoryId"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Select a category</FormLabel>
-                      <Select
-                        disabled={isLoading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a size"
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Sermon Category:</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? categories.find(
+                                    (category) => category.name === field.value
+                                  )?.name
+                                : "Select a category"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search category..."
+                              className="h-9"
                             />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories.map((size) => (
-                            <SelectItem key={size.id} value={size.id}>
-                              {size.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                            <CommandEmpty>No category found.</CommandEmpty>
+
+                            <CommandGroup>
+                              {categories.map((category) => (
+                                <CommandItem
+                                  value={category.name}
+                                  key={category.id}
+                                  onSelect={() => {
+                                    form.setValue("categoryId", category.name);
+                                  }}
+                                >
+                                  {category.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      category.name === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="dateDelivered"
@@ -342,7 +383,6 @@ const SermonForm = ({
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
-                              disabled={isLoading}
                               variant="outline"
                               className={cn(
                                 "w-full pl-3 text-left font-normal",
@@ -426,31 +466,60 @@ const SermonForm = ({
                   control={form.control}
                   name="locationId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Sermon Location:</FormLabel>
-                      <Select
-                        disabled={isLoading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a location"
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? locations.find(
+                                    (location) => location.name === field.value
+                                  )?.name
+                                : "Select a location"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search location..."
+                              className="h-9"
                             />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {locations.map((location) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                            <CommandEmpty>No location found.</CommandEmpty>
+
+                            <CommandGroup>
+                              {locations.map((location) => (
+                                <CommandItem
+                                  value={location.name}
+                                  key={location.id}
+                                  onSelect={() => {
+                                    form.setValue("locationId", location.name);
+                                  }}
+                                >
+                                  {location.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      location.name === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </FormItem>
                   )}
                 />
@@ -494,7 +563,7 @@ const SermonForm = ({
                               className="absolute top-2 right-2 rounded-full border bg-destructive/15 p-1"
                               onClick={() => handleImageDelete(imageUrl)}
                             >
-                              {imageIsDeleting ? (
+                              {fileIsDeleting ? (
                                 <Loader2 className="h-6 w-6 text-destructive" />
                               ) : (
                                 <X className="w-6 h-6 text-destructive" />
@@ -518,6 +587,7 @@ const SermonForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="isPublished"
@@ -548,6 +618,7 @@ const SermonForm = ({
                   </FormItem>
                 )}
               />
+
               <div className=" flex justify-end gap-4 items-center">
                 <Button
                   variant="outline"
