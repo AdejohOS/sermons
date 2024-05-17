@@ -33,7 +33,7 @@ const Footer = () => {
         </div>
       </div>
       <p className="text-slate-500 text-center text-xs">
-        &#169; Koinonia Network International 2024
+        &#169; Sermon Network International 2024
       </p>
     </footer>
   );
