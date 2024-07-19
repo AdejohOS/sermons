@@ -4,24 +4,21 @@ import { Badge } from "@/components/ui/badge";
 import { PlayButton } from "@/components/play-button";
 
 import { format } from "date-fns";
-import { ExtendedSermon } from "./sermons";
-import Link from "next/link";
 
-interface SermonCard {
-  data: ExtendedSermon;
-  onClick: (id: string) => void;
+import Link from "next/link";
+import { Sermon } from "@/lib/types";
+
+interface SermonProps {
+  sermon: Sermon;
 }
 
-const SermonItem = ({ data, onClick }: SermonCard) => {
+const SermonItem = ({ sermon }: SermonProps) => {
   return (
-    <div
-      onClick={() => onClick(data.id)}
-      className="border-b shadow-md bg-background rounded-md overflow-hidden"
-    >
+    <div className="border-b shadow-md bg-background rounded-md overflow-hidden">
       <div className="relative group cursor-pointer transition">
         <div className="relative aspect-square ">
           <Image
-            src={data?.imageUrl! || "/images/audioPlace.png"}
+            src={sermon?.imageUrl! || "/images/audioPlace.png"}
             alt="image"
             fill
             className="object-cover"
@@ -42,25 +39,27 @@ const SermonItem = ({ data, onClick }: SermonCard) => {
         <span className="flex gap-1 items-center text-muted-foreground">
           <CalendarDays className="h-3 w-3 shrink-0 " />
           <p className="text-xs">
-            {format(data.dateDelivered, "MMMM do, yyyy")}
+            {format(sermon.dateDelivered, "MMMM do, yyyy")}
           </p>
         </span>
         <span className="flex gap-1 items-center text-muted-foreground">
           <MicIcon className="h-3 w-3 shrink-0" />
-          <p className="text-xs"> {data.author.name}</p>
+          <p className="text-xs"> {sermon.author.name}</p>
         </span>
         <Link
           className="font-medium truncate mt-2 "
-          href={`/sermons/${data.id}`}
+          href={`/sermons/${sermon.slug}`}
         >
-          {data.title}
+          {sermon.title}
+
+          {}
         </Link>
         <div className="flex items-center justify-between mt-2 text-muted-foreground">
-          <a href={data.fileUrl} download="file.mp3">
+          <a href={sermon.fileUrl} download="file.mp3">
             <Download className="h-4 w-4" />
           </a>
           <Badge variant="outline" className="text-muted-foreground">
-            {data.category?.name}
+            {sermon.category?.name}
           </Badge>
         </div>
       </div>

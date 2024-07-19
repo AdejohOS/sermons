@@ -22,13 +22,13 @@ export const Social = () => {
     <div className="flex items-center w-full gap-x-2">
       <Button
         variant="outline"
-        className="w-full flex items-center"
+        className="w-full flex items-center gap-2"
         size="lg"
         onClick={() => onClick()}
         disabled={isPending}
       >
         {isPending && <Loader2 className="h-5 w-5 mr-2 animate-spin" />}
-        <FcGoogle className=" h-5 w-5" />
+        <FcGoogle className=" h-5 w-5" /> Google
       </Button>
     </div>
   );

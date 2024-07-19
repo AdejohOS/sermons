@@ -12,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -22,13 +23,13 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon, CheckIcon, Loader2, Trash, X } from "lucide-react";
+import { CalendarIcon, Loader2, Trash, X } from "lucide-react";
 
 import { Textarea } from "@/components/ui/textarea";
 
 import { useParams, useRouter } from "next/navigation";
 import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
-import toast from "react-hot-toast";
+
 import { SermonValues, SermonSchema } from "@/lib/validation";
 
 import { useEffect, useState } from "react";
@@ -38,14 +39,7 @@ import { AlertModal } from "@/components/modals/alert-modal";
 import Headings from "@/components/headings";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
+
 import { Calendar } from "@/components/ui/calendar";
 
 import AudioPlayer from "react-h5-audio-player";
@@ -57,6 +51,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 
 interface SermonFormProps {
   initialData: Sermon | null;
@@ -127,11 +122,16 @@ const SermonForm = ({
       } else {
         await axios.post("/api/sermon", values);
       }
-      router.refresh();
+      console.log(values);
+      toast({ title: "Success", description: toastMessage });
       router.push(`/admin/sermons`);
-      toast.success(toastMessage);
+      router.refresh();
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
     }
@@ -150,11 +150,15 @@ const SermonForm = ({
       axios.post("/api/uploadthing/delete", { fileKey });
       axios.post("/api/uploadthing/clear", { sermonKey });
       await axios.delete(`/api/sermon/${params.sermonId}`);
-      router.refresh();
+      toast({ title: "Success", description: "Sermon deleted." });
       router.push(`/admin/sermons`);
-      toast.success("Sermon deleted.");
+      router.refresh();
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -170,11 +174,15 @@ const SermonForm = ({
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");
-          toast.success("Image deleted");
+          toast({ title: "Success", description: "Image deleted" });
         }
       })
       .catch(() => {
-        toast.error("Something went wrong");
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: "Please try again",
+        });
       })
       .finally(() => {
         setImageIsDeleting(false);
@@ -190,11 +198,15 @@ const SermonForm = ({
       .then((res) => {
         if (res.data.success) {
           setFileUrl("");
-          toast.success("File deleted");
+          toast({ title: "Success", description: "File deleted" });
         }
       })
       .catch(() => {
-        toast.error("Something went wrong");
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: "Please try again",
+        });
       })
       .finally(() => {
         setFileIsDeleting(false);
@@ -257,7 +269,11 @@ const SermonForm = ({
                     <FormItem>
                       <FormLabel>Sermon Title:</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Enter sermon title" />
+                        <Input
+                          {...field}
+                          placeholder="Enter sermon title"
+                          disabled={isLoading}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -314,7 +330,7 @@ const SermonForm = ({
                           <SelectTrigger>
                             <SelectValue
                               defaultValue={field.value}
-                              placeholder="Select a size"
+                              placeholder="Select a category"
                             />
                           </SelectTrigger>
                         </FormControl>
@@ -409,10 +425,16 @@ const SermonForm = ({
                               endpoint="sermonFile"
                               onClientUploadComplete={(res) => {
                                 setFileUrl(res[0].url);
-                                toast.success("File uploaded sucessfully");
+                                toast({
+                                  title: "Success",
+                                  description: "File uploaded sucessfully",
+                                });
                               }}
                               onUploadError={(error: Error) => {
-                                toast.error(`${error?.message}`);
+                                toast({
+                                  title: "Somrtging went wrong",
+                                  description: `${error?.message}`,
+                                });
                               }}
                             />
                           )}
@@ -506,10 +528,16 @@ const SermonForm = ({
                             endpoint="authorImage"
                             onClientUploadComplete={(res) => {
                               setImageUrl(res[0].url);
-                              toast.success("Image uploaded sucessfully");
+                              toast({
+                                title: "Success",
+                                description: "Image uploaded sucessfully",
+                              });
                             }}
                             onUploadError={(error: Error) => {
-                              toast.error(`${error?.message}`);
+                              toast({
+                                title: "Something went wrong",
+                                description: `${error?.message}`,
+                              });
                             }}
                           ></UploadDropzone>
                         )}
@@ -518,42 +546,43 @@ const SermonForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="isPublished"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div>
-                        <div className="flex items-center">
-                          <label
-                            htmlFor="isPublished"
-                            className="whitespace-nowrap pr-3 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Publish this sermon
-                          </label>
-                          <Checkbox
-                            onCheckedChange={field.onChange}
-                            checked={field.value}
-                            id="isPublished"
-                            className="mr-2 h-5 w-5"
-                          />
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <FormControl>
+                        <div>
+                          <div className="flex items-center space-x-2 relative">
+                            <Label htmlFor="isPublished">
+                              Publish this sermon
+                            </Label>
+                            <Checkbox
+                              onCheckedChange={field.onChange}
+                              checked={field.value}
+                              id="isPublished"
+                            />
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">
+                            <span className="text-destructive">*</span> Click on
+                            the checkbox if you wish to publish this sermon.
+                          </p>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">
-                          <span className="text-destructive">*</span> Click on
-                          the checkbox if you wish to publish this sermon.
-                        </p>
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
+                      </FormControl>
+                    </FormItem>
+                  );
+                }}
               />
+
               <div className=" flex justify-end gap-4 items-center">
                 <Button
                   variant="outline"
                   type="button"
+                  disabled={isLoading}
                   onClick={() => {
-                    router.back();
+                    router.push("/admin/sermons");
                   }}
                 >
                   Cancel

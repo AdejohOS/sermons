@@ -1,95 +1,40 @@
-"use client";
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { PlayButton } from "@/components/play-button";
 import { Badge } from "@/components/ui/badge";
 
-import { Calendar, CalendarDays, Loader2, MicIcon, AlertTriangle  } from "lucide-react";
-import Image from "next/image";
-
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
 import SermonItem from "./sermonItem";
 
 import NoResults from "@/components/no-results";
-import { Author, Category, Sermon, Location } from "@prisma/client";
-import useOnPlay from "@/hooks/use-on-play";
-import { useEffect, useState } from "react";
-import { Island_Moments } from "next/font/google";
 
-export type ExtendedSermon = Sermon & {
-  author: Author;
-  category: Category;
-  location: Location;
-};
+import { db } from "@/lib/db";
 
-export const Sermons = () => {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["mySermons"],
-    queryFn: async () => {
-      const { data } = await axios.get("/api/sermon");
-      console.log(data);
-      return data as ExtendedSermon[];
+export const Sermons = async () => {
+  const sermons = await db.sermon.findMany({
+    where: {
+      isPublished: true,
+    },
+
+    include: {
+      author: true,
+      category: true,
+      location: true,
+      favourites: true,
+    },
+    orderBy: {
+      dateDelivered: "desc",
     },
   });
 
   return (
-  <>
-  {isLoading && 
-      <div className="flex gap-5">
-      <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[125px] w-[250px] rounded-xl"/>
-        <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+        {sermons?.length === 0 && <NoResults />}
+
+        {sermons?.map((sermon) => (
+          <SermonItem key={sermon.id} sermon={sermon} />
+        ))}
       </div>
-        </div>
-
-        <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[125px] w-[250px] rounded-xl"/>
-        <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
-      </div>
-        </div>
-
-        <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[125px] w-[250px] rounded-xl"/>
-        <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
-      </div>
-        </div>
-
-        <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[125px] w-[250px] rounded-xl"/>
-        <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
-      </div>
-        </div>
-
-        
-      </div>
-    }
-
-  {isError && <div className="h-full w-full flex flex-col items-center justify-center">
-  <AlertTriangle className="w-12 h-12 text-red-500" />
-  <p className="text-xl">Failed to load sermons</p>
-  <p>Check Connection!</p>
-  </div>}
-  
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5"> 
-      {data?.length === 0 && <NoResults />}
-
-      {data?.map((sermon) => (
-        <SermonItem
-          onClick={(id: string) => {}}
-          key={sermon.id}
-          data={sermon}
-        />
-      ))}
-    </div>
     </>
   );
 };

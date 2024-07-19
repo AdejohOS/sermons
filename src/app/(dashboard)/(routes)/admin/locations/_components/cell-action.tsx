@@ -3,7 +3,6 @@
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { AuthorColumn } from "./columns";
+import { LocationColumn } from "./columns";
+import { toast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
-  data: AuthorColumn;
+  data: LocationColumn;
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -31,10 +31,14 @@ export const CellAction = ({ data }: CellActionProps) => {
     try {
       setLoading(true);
 
-      toast.success("Product deleted.");
+      toast({ title: "Success", description: "Product deleted." });
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -43,7 +47,7 @@ export const CellAction = ({ data }: CellActionProps) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Author ID copied to clipboard.");
+    toast({ title: "Success", description: "Author ID copied to clipboard." });
   };
 
   return (
@@ -64,7 +68,7 @@ export const CellAction = ({ data }: CellActionProps) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => router.push(`/admin/author/${data.id}`)}
+            onClick={() => router.push(`/admin/locations/${data.id}`)}
           >
             <Eye className="mr-2 h-4 w-4" /> View
           </DropdownMenuItem>
@@ -72,9 +76,7 @@ export const CellAction = ({ data }: CellActionProps) => {
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              router.push(`/admin/author/${data.id}`)
-            }
+            onClick={() => router.push(`/admin/locations/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

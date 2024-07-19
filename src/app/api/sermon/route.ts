@@ -1,4 +1,4 @@
-import { currentRole } from "@/lib/auth";
+import { currentRole, currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { toSlug } from "@/lib/utils";
 import { UserRole } from "@prisma/client";
@@ -7,10 +7,10 @@ import { nanoid } from "nanoid";
 
 export async function POST(req: Request) {
   try {
-    const role = await currentRole();
+    const user = await currentUser();
 
-    if (role !== UserRole.ADMIN) {
-      return new NextResponse("Unauthorised access", { status: 403 });
+    if (user?.role !== "ADMIN" && !user) {
+      return new NextResponse("Unauthourised access", { status: 401 });
     }
 
     const body = await req.json();
@@ -40,7 +40,9 @@ export async function POST(req: Request) {
         imageUrl,
         fileUrl,
 
+        userId: user.id,
         authorId,
+
         locationId,
         categoryId,
         isPublished,
@@ -64,6 +66,7 @@ export async function GET(req: Request) {
       include: {
         author: true,
         category: true,
+        location: true,
       },
       orderBy: {
         dateDelivered: "desc",

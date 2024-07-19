@@ -3,7 +3,6 @@
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SermonColumn } from "./columns";
+import { toast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
   data: SermonColumn;
@@ -31,10 +31,14 @@ export const CellAction = ({ data }: CellActionProps) => {
     try {
       setLoading(true);
 
-      toast.success("Sermon deleted.");
+      toast({ title: "Success", description: "Sermon deleted." });
       router.refresh();
     } catch (error) {
-      toast.error("Something went wrong");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: "Please try again!",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -43,7 +47,7 @@ export const CellAction = ({ data }: CellActionProps) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Author ID copied to clipboard.");
+    toast({ title: "Success", description: "Author ID copied to clipboard." });
   };
 
   return (

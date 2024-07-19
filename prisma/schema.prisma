@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+ 
 }
 
 datasource db {
@@ -29,6 +30,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 enum UserRole {
@@ -44,8 +46,15 @@ model User {
   image         String?
   password String?
 
+  username String?
+
   role UserRole @default(USER)
   accounts      Account[]
+
+  sermonsPosted Sermon[]
+  favourites Favourite[]
+  comments Comment[]
+  likes Like[]
   
 }
 
@@ -71,7 +80,7 @@ model Author {
   id String @id @default(cuid())
   name String
   imageUrl String?
-  about String?
+  about String? @db.Text
 
   sermons Sermon[]
 
@@ -122,12 +131,53 @@ model Sermon {
   locationId String
   location Location @relation(fields: [locationId], references: [id])
 
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
+
+  favourites Favourite[]
+  comments Comment[]
+  likes Like[]
+
+
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //@@index([authorId])
-  //@@index([categoryId])
- //@@index([locationId])
+}
 
+model Comment {
+  id String @id @default(cuid())
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sermonId String
+  sermon   Sermon @relation(fields: [sermonId], references: [id], onDelete: Cascade)
+  likes Like[]
+
+   
+}
+
+model Favourite {
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sermonId String
+  sermon   Sermon @relation(fields: [sermonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, sermonId])
+  
+}
+
+model Like {
+  id String @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sermonId String?
+  sermon   Sermon? @relation(fields: [sermonId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 

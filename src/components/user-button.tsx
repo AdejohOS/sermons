@@ -14,6 +14,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { LogoutButton } from "./auth/logout-button";
 import { LogOut, Settings } from "lucide-react";
 import { Separator } from "./ui/separator";
+import Link from "next/link";
 
 export const UserButton = () => {
   const user = useCurrentUser();
@@ -36,8 +37,11 @@ export const UserButton = () => {
         </div>
         <Separator className="mb-2" />
         <DropdownMenuItem className="cursor-pointer">
-          <Settings className="h-4 w-4 mr-2" />
-          Settings
+          <Link href="/settings" className="flex">
+            {" "}
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Link>
         </DropdownMenuItem>
         <LogoutButton>
           <DropdownMenuItem className="cursor-pointer">

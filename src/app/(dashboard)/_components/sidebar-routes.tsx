@@ -7,18 +7,20 @@ import {
   MapPin,
   Folder,
   GalleryThumbnails,
-  Heart,
-  Layout,
   Mic,
   Play,
   Videotape,
   SearchIcon,
+  User,
+  ListMusic,
 } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 import { SheetClose } from "@/components/ui/sheet";
 import { useState } from "react";
+import { TbPlaylist } from "react-icons/tb";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import Library from "@/components/library";
 
 const adminRoutes = [
   {
@@ -52,6 +54,11 @@ const adminRoutes = [
     label: "Locations",
     href: "/admin/locations",
   },
+  {
+    icon: User,
+    label: "Users",
+    href: "/admin/users",
+  },
 ];
 
 const userRoutes = [
@@ -63,12 +70,6 @@ const userRoutes = [
   {
     icon: Folder,
     label: "Library",
-    href: "/playlist",
-  },
-
-  {
-    icon: Heart,
-    label: "Liked",
     href: "/playlist",
   },
 ];

@@ -6,37 +6,47 @@ import {
   apiAuthPrefix,
   publicRoutes,
   authRoutes,
-  adminRoutes, 
+  adminAuthPrefix,
+  freeUserPrefix,
 } from "@/routes";
 
-const { auth } = NextAuth(authConfig);
+import { auth } from "@/auth";
 
 export default auth((req) => {
-  //const { nextUrl } = req;
-  //const isLoggedIn = !!req.auth;
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
 
-  //const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  //const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  //const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  const isFreeUserRoute = nextUrl.pathname.startsWith(freeUserPrefix);
 
-  //const isAdminRoute = adminRoutes.includes(nextUrl.pathname);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
- // if (isApiAuthRoute) {
-    //return;
- // }
+  const isAdminRoute = nextUrl.pathname.startsWith(adminAuthPrefix);
 
-  //if (isAuthRoute) {
-  //  if (isLoggedIn) {
-    //  return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-    //}
-   // return;
-  //}
+  if (isApiAuthRoute) {
+    return;
+  }
 
- // if (!isLoggedIn && !isPublicRoute) {
-   // return Response.redirect(new URL("/auth/login", nextUrl));
- // }
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
+    return;
+  }
 
-  //return;
+  if (isAdminRoute) {
+    if (req.auth?.user.role === "ADMIN") {
+      return;
+    }
+    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+  }
+
+  if (!isLoggedIn && !isPublicRoute && !isFreeUserRoute) {
+    return Response.redirect(new URL("/auth/login", nextUrl));
+  }
+
+  return;
 });
 
 // Optionally, don't invoke Middleware on some paths

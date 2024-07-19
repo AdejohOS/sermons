@@ -35,7 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useParams, useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
-import toast from "react-hot-toast";
+
 import { CategoryValues, CategorySchema } from "@/lib/validation";
 
 import { useFormStatus } from "react-dom";
@@ -48,6 +48,7 @@ import { AlertModal } from "@/components/modals/alert-modal";
 import Headings from "@/components/headings";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
 
 interface CategoryFormProps {
   initialData: Category | null;
@@ -67,7 +68,7 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
   const router = useRouter();
 
   const title = initialData ? "Edit Category" : "Create a category";
-  const description = initialData ? "Edit an category" : "Add a new category";
+  const description = initialData ? "Edit a category" : "Add a new category";
   const action = initialData ? "Save changes" : "Create category";
   const toastMessage = initialData ? "Category updated!" : "Category created!";
 
@@ -98,11 +99,15 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
         await axios.post("/api/category", values);
       }
 
-      router.refresh();
+      toast({ title: "Success", description: toastMessage });
       router.push(`/admin/categories`);
-      toast.success(toastMessage);
+      router.refresh();
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
     }
@@ -118,9 +123,13 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
       await axios.delete(`/api/category/${params.categoryId}`);
       router.refresh();
       router.push(`/admin/categories`);
-      toast.success("Category deleted.");
+      toast({ title: "Success", description: "Category deleted." });
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -136,11 +145,15 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");
-          toast.success("Image deleted");
+          toast({ title: "Success", description: "Image deleted" });
         }
       })
       .catch(() => {
-        toast.error("Something went wrong");
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: "Please try again",
+        });
       })
       .finally(() => {
         setFileIsDeleting(false);
@@ -240,10 +253,17 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
                             endpoint="categoryImage"
                             onClientUploadComplete={(res) => {
                               setImageUrl(res[0].url);
-                              toast.success("Image uploaded sucessfully");
+                              toast({
+                                title: "Success",
+                                description: "Image uploaded sucessfully",
+                              });
                             }}
                             onUploadError={(error: Error) => {
-                              toast.error(`${error?.message}`);
+                              toast({
+                                variant: "destructive",
+                                title: "Something went wrong",
+                                description: `${error?.message}`,
+                              });
                             }}
                           ></UploadDropzone>
                         )}
@@ -274,8 +294,9 @@ const CategoryForm = ({ initialData }: CategoryFormProps) => {
                 <Button
                   variant="outline"
                   type="button"
+                  disabled={isLoading}
                   onClick={() => {
-                    router.back();
+                    router.push("/admin/categories");
                   }}
                 >
                   Cancel

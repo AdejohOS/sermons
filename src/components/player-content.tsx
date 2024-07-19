@@ -5,11 +5,9 @@ import { HiSpeakerXMark, HiSpeakerWave } from "react-icons/hi2";
 import { Author, Category, Sermon, Location } from "@prisma/client";
 import MediaItem from "./media-item";
 import { ExtendedSermon } from "@/app/(dashboard)/_components/sermons";
+import { PlayButton } from "./play-button";
 
-interface PlayerContentProps {
-  sermon: ExtendedSermon;
-}
-const PlayerContent = ({ sermon }: PlayerContentProps) => {
+const PlayerContent = () => {
   const [volume, setVolume] = useState(1);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -19,7 +17,7 @@ const PlayerContent = ({ sermon }: PlayerContentProps) => {
     <div className="grid grid-cols-2 md:grid-cols-3 h-full">
       <div className="flex w-full justify-start">
         <div className="flex items-center gap-x-4">
-          <MediaItem data={sermon} />
+          <MediaItem />
           <>Liked Songs</>
         </div>
       </div>

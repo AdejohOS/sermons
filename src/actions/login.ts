@@ -21,7 +21,7 @@ export const login = async (values: LoginUserValues) => {
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
-    return { error: "Email does not exist" };
+    return { error: "Wrong email or password" };
   }
 
   if (!existingUser.emailVerified) {

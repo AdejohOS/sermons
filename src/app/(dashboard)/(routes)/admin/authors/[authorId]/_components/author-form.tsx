@@ -35,7 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useParams, useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
-import toast from "react-hot-toast";
+
 import {
   CreateAuthorSchema,
   CreateAuthorValues,
@@ -52,6 +52,7 @@ import { AlertModal } from "@/components/modals/alert-modal";
 import Headings from "@/components/headings";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
 
 interface UpdateAuthorFormProps {
   initialData: Author | null;
@@ -101,12 +102,15 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
       } else {
         await axios.post("/api/author", values);
       }
-
-      router.refresh();
+      toast({ title: "Success", description: toastMessage });
       router.push(`/admin/authors`);
-      toast.success(toastMessage);
+      router.refresh();
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again later",
+      });
     } finally {
       setLoading(false);
     }
@@ -122,9 +126,13 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
       await axios.delete(`/api/author/${params.authorId}`);
       router.refresh();
       router.push(`/admin/authors`);
-      toast.success("Author deleted.");
+      toast({ title: "Success", description: "Author deleted." });
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again later",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -140,11 +148,15 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");
-          toast.success("Image deleted");
+          toast({ title: "Success", description: "Image deleted" });
         }
       })
       .catch(() => {
-        toast.error("Something went wrong");
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: "Please try again later",
+        });
       })
       .finally(() => {
         setFileIsDeleting(false);
@@ -244,10 +256,15 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
                             endpoint="authorImage"
                             onClientUploadComplete={(res) => {
                               setImageUrl(res[0].url);
-                              toast.success("Image uploaded sucessfully");
+                              toast({
+                                description: "Image uploaded sucessfully",
+                              });
                             }}
                             onUploadError={(error: Error) => {
-                              toast.error(`${error?.message}`);
+                              toast({
+                                variant: "destructive",
+                                description: `${error?.message}`,
+                              });
                             }}
                           ></UploadDropzone>
                         )}
@@ -278,8 +295,9 @@ const AuthorForm = ({ initialData }: UpdateAuthorFormProps) => {
                 <Button
                   variant="outline"
                   type="button"
+                  disabled={isLoading}
                   onClick={() => {
-                    router.back();
+                    router.push("/admin/authors");
                   }}
                 >
                   Cancel

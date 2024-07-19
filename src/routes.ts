@@ -6,13 +6,20 @@
 export const publicRoutes = ["/", "/auth/new-verification", "/api/uploadthing"];
 
 /**
+ * An array of routes that are accessible to the public
+ * These routes do not require authentication
+ * @type {string[]}
+ */
+export const freeUserPrefix = "/sermons/";
+
+/**
  * An array of routes that are used for authentication
  * These routes will redirect logged in users to /settings
  * @type {string[]}
  */
 export const authRoutes = [
   "/auth/login",
-  "/auth/register", 
+  "/auth/register",
   "/auth/error",
   "/auth/reset",
   "/auth/new-password",
@@ -23,7 +30,7 @@ export const authRoutes = [
  * These routes will redirect logged in users to /settings
  * @type {string[]}
  */
-export const adminRoutes = ["/admin/"];
+export const adminAuthPrefix = "/admin/";
 
 /**
  * The prefix for API authentication routes
@@ -36,4 +43,4 @@ export const apiAuthPrefix = "/api/auth";
  * The default redirect path after logging in
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = "/";
+export const DEFAULT_LOGIN_REDIRECT = "/settings";

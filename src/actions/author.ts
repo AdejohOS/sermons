@@ -1,6 +1,5 @@
 "use server";
 
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { db } from "@/lib/db";
 
 import { revalidatePath } from "next/cache";

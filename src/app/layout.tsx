@@ -13,6 +13,7 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import QueryProvider from "@/providers/query-provider";
 import Player from "@/components/player";
+import { Toaster } from "@/components/ui/toaster";
 
 const font = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -43,7 +44,7 @@ export default async function RootLayout({
               disableTransitionOnChange
               storageKey="koinonia-app-1"
             >
-              <ToastProvider />
+              <Toaster />
               <NextSSRPlugin
                 routerConfig={extractRouterConfig(ourFileRouter)}
               />

@@ -10,8 +10,8 @@ const MobileSidebar = () => {
   return (
     <Sheet>
       <SheetTrigger asChild className="md:hidden hover:opacity-75">
-        <Button size="icon" variant="outline">
-          <Menu />
+        <Button size="icon" variant="outline" className="rounded-full">
+          <Menu className="shrink-0 w-4 h-4" />
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="p-0 bg-white">

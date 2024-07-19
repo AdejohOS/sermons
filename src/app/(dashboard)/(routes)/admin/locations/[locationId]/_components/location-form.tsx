@@ -13,41 +13,26 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import {
-  CalendarIcon,
-  CheckIcon,
-  Loader2,
-  Trash,
-  X,
-  XCircle,
-} from "lucide-react";
+
+import { Loader2, Trash, X, XCircle } from "lucide-react";
 
 import { Textarea } from "@/components/ui/textarea";
 
 import { useParams, useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
-import toast from "react-hot-toast";
+
 import { LocationSchema, LocationValues } from "@/lib/validation";
 
-import { useFormStatus } from "react-dom";
-
 import { useEffect, useState, useTransition } from "react";
-import { createAuthor, updateAuthor } from "@/actions/author";
 import { Location } from "@prisma/client";
 import { AlertModal } from "@/components/modals/alert-modal";
 
 import Headings from "@/components/headings";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
 
 interface LocationFormProps {
   initialData: Location | null;
@@ -98,11 +83,15 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
         await axios.post("/api/location", values);
       }
 
-      router.refresh();
+      toast({ title: "Success", description: toastMessage });
       router.push(`/admin/locations`);
-      toast.success(toastMessage);
+      router.refresh();
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
     }
@@ -118,9 +107,13 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
       await axios.delete(`/api/location/${params.authorId}`);
       router.refresh();
       router.push(`/admin/locations`);
-      toast.success("Location deleted.");
+      toast({ title: "Success", description: "Location deleted." });
     } catch (error: any) {
-      toast.error("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
@@ -136,11 +129,15 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
       .then((res) => {
         if (res.data.success) {
           setImageUrl("");
-          toast.success("Image deleted");
+          toast({ title: "Success", description: "Image deleted" });
         }
       })
       .catch(() => {
-        toast.error("Something went wrong");
+        toast({
+          variant: "destructive",
+          title: "Something went wrong.",
+          description: "Please try again",
+        });
       })
       .finally(() => {
         setFileIsDeleting(false);
@@ -240,10 +237,16 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
                             endpoint="locationImage"
                             onClientUploadComplete={(res) => {
                               setImageUrl(res[0].url);
-                              toast.success("Image uploaded sucessfully");
+                              toast({
+                                title: "Success",
+                                description: "Image uploaded sucessfully",
+                              });
                             }}
                             onUploadError={(error: Error) => {
-                              toast.error(`${error?.message}`);
+                              toast({
+                                title: "Something went wrong",
+                                description: `${error?.message}`,
+                              });
                             }}
                           ></UploadDropzone>
                         )}
@@ -274,8 +277,9 @@ const LocationForm = ({ initialData }: LocationFormProps) => {
                 <Button
                   variant="outline"
                   type="button"
+                  disabled={isLoading}
                   onClick={() => {
-                    router.back();
+                    router.push("/admin/locations");
                   }}
                 >
                   Cancel

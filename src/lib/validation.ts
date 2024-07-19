@@ -50,7 +50,7 @@ export type CategoryValues = z.infer<typeof CategorySchema>;
 // Location schema
 export const LocationSchema = z.object({
   name: z.string().min(2, "Name is required!"),
-  address: z.string().max(50).optional(),
+  address: z.string().optional(),
   imageUrl: z.string().optional(),
 });
 export type LocationValues = z.infer<typeof LocationSchema>;
@@ -58,7 +58,7 @@ export type LocationValues = z.infer<typeof LocationSchema>;
 
 export const SermonSchema = z.object({
   title: z.string().min(2, "Title is required!"),
-  about: z.string().max(50).optional(),
+  about: z.string().optional(),
   imageUrl: z.string().optional(),
   fileUrl: z.string(),
   authorId: z.string().min(1),
@@ -68,3 +68,11 @@ export const SermonSchema = z.object({
   dateDelivered: z.date(),
 });
 export type SermonValues = z.infer<typeof SermonSchema>;
+
+export const CreateCommentSchema = z.object({
+  description: z
+    .string()
+    .min(1, "Min of 1 character")
+    .max(500, "Max of 500 character"),
+});
+export type CreateCommentValues = z.infer<typeof CreateCommentSchema>;

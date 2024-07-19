@@ -6,19 +6,18 @@ import { Sermon } from "@prisma/client";
 import usePlayer from "@/hooks/use-player";
 
 interface MediaItemProps {
-  data: Sermon;
   onClick?: (id: string) => void;
 }
 
-const MediaItem = ({ data, onClick }: MediaItemProps) => {
+const MediaItem = ({ onClick }: MediaItemProps) => {
   const player = usePlayer();
 
   const handleClick = () => {
     if (onClick) {
-      return onClick(data.id);
+      return onClick("");
     }
 
-    return player.setId(data.id);
+    return player.setId("");
   };
 
   return (
@@ -38,7 +37,7 @@ const MediaItem = ({ data, onClick }: MediaItemProps) => {
       <div
         className="
           relative 
-          rounded-md 
+          rounded-full 
           min-h-[48px] 
           min-w-[48px] 
           overflow-hidden
@@ -46,13 +45,13 @@ const MediaItem = ({ data, onClick }: MediaItemProps) => {
       >
         <Image
           fill
-          src={data?.imageUrl || "/images/audioPlace.png"}
+          src={"/images/audioPlace.png"}
           alt="MediaItem"
-          className="object-cover"
+          className="object-fit animate-pulse"
         />
       </div>
       <div className="flex flex-col gap-y-1 overflow-hidden">
-        <p className="text-white truncate">{data?.title}</p>
+        <p className="text-white truncate">Hello</p>
         <p className="text-neutral-400 text-sm truncate">By Sunday Adejoh</p>
       </div>
     </div>
